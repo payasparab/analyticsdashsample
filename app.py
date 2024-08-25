@@ -24,17 +24,9 @@ sort_criteria = st.radio(
 # Apply custom sorting logic based on the selected criteria
 data_sorted_custom = custom_sort(data, sort_criteria)
 
-# Create a dropdown for selecting the column to sort by
-sort_column = st.selectbox("Select column to order by:", data_sorted_custom.columns)
 
-# Add a checkbox to toggle between ascending and descending order
-ascending_order = st.checkbox("Sort in ascending order", value=True)
-
-# Sort the DataFrame based on the selected column and order
-data_sorted_final = data_sorted_custom.sort_values(by=sort_column, ascending=ascending_order)
-
-# Remove commas from the CustomerID column
-data_sorted_final['CustomerID'] = data_sorted_final['CustomerID'].apply(lambda x: str(x).replace(',', ''))
+# Convert CustomerID to integer to remove decimal points
+data_sorted_final['CustomerID'] = data_sorted_final['CustomerID'].astype(int)
 
 # Round `avg_` columns to no decimal places
 avg_columns = [col for col in data_sorted_final.columns if col.startswith("avg_")]
