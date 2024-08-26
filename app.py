@@ -50,7 +50,7 @@ relationship_length_range = st.slider(
 filtered_data = filtered_data[
     (filtered_data['num_orders'] >= num_orders_range[0]) & (filtered_data['num_orders'] <= num_orders_range[1]) &
     (filtered_data['avg_rev_per_order'] >= avg_rev_per_order_range[0]) & (filtered_data['avg_rev_per_order'] <= avg_rev_per_order_range[1]) &
-    (filtered_data['time_since_last_order_days'] >= time_since_last_order_range[0]) & (filtered_data['time_since_last_order_days'] <= time_since_last_order_range[1])  
+    (filtered_data['time_since_last_order_days'] >= time_since_last_order_range[0]) & (filtered_data['time_since_last_order_days'] <= time_since_last_order_range[1])   
 ]
 
 filtered_data = filtered_data[
