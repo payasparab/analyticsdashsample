@@ -104,6 +104,36 @@ data_display.columns = [
 def convert_df_to_csv(df):
     return df.to_csv(index=False).encode('utf-8')
 
+## Add some data around the current XS of data
+# Display the number of customers matching the criteria
+num_customers = data_sorted_custom['CustomerID'].nunique()
+st.metric(label="Number of Customers Matching Criteria", value=num_customers)
+
+# Create a list to store descriptions of applied filters
+applied_filters = []
+
+# Checkbox filters
+if recurring_orders:
+    applied_filters.append("Recurring customers (num_orders > 1)")
+if multiple_items:
+    applied_filters.append("Customers with multiple unique items (num_unique_items_bought > 1)")
+
+# Slider filters
+applied_filters.append(f"Number of Orders between {num_orders_range[0]} and {num_orders_range[1]}")
+applied_filters.append(f"Avg Revenue per Order between ${avg_rev_per_order_range[0]:,.0f} and ${avg_rev_per_order_range[1]:,.0f}")
+applied_filters.append(f"Time Since Last Order between {time_since_last_order_range[0]} and {time_since_last_order_range[1]} days")
+applied_filters.append(f"Relationship Length between {relationship_length_range[0]} and {relationship_length_range[1]} days")
+
+# Display the applied filters as a list
+st.text("Filters Applied:")
+st.write(", ".join(applied_filters))
+
+# Display the total number of customers covered by the current cut of data
+total_customers = data['CustomerID'].nunique()
+percentage_customers = (num_customers/total_customers) * 100
+st.write(f"Isolating {num_customers} accounts from {total_customers} total customers or {percentage_customers:.2f}%")
+
+
 # Display the final sorted DataFrame
 st.write("Sorted Customer Data:")
 st.dataframe(
