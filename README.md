@@ -1,6 +1,5 @@
 # analyticsdashsample
 
-ONTEXT
 Imagine you're an Analytics Engineer for an online retail company.
 
 Your main stakeholders are:
