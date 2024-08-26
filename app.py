@@ -7,20 +7,8 @@ data = pd.read_csv('customer_ranker.csv')
 # Add a header
 st.title("Interactive Customer Ranker")
 
-# Custom sorting logic function for "Recently Sold Accounts" and "Aged Accounts"
-def custom_sort(data, criteria):
-    if criteria == "Recently Sold Accounts":
-        return data.sort_values(by="time_since_last_order_days", ascending=False)
-    elif criteria == "Aged Accounts":
-        return data.sort_values(by="time_since_last_order_days", ascending=True)
-    return data
-
 # Create a toggle with custom sorting options
 st.header('Sorting Criteria')
-sort_criteria = st.radio(
-    "Select sorting criteria:",
-    ("Recently Sold Accounts", "No Recent Sales Accounts")
-)
 
 st.header('Quick Filters')
 # Add filters for recurring orders and multiple unique items
@@ -47,11 +35,9 @@ if recurring_orders:
 if multiple_items:
     filtered_data = filtered_data[filtered_data['num_unique_items_bought'] > 1]
 
-# Apply custom sorting logic based on the selected criteria
-data_sorted_custom = custom_sort(filtered_data, sort_criteria)
 
 # Apply secondary sorting by engagement_score
-data_sorted_custom = data_sorted_custom.sort_values(by=['time_since_last_order_days', 'engagement_score'], ascending=[sort_criteria == "Aged Accounts", False])
+data_sorted_custom =  filtered_data.sort_values(by=['engagement_score', 'total_net_rev'], ascending=[False, False])
 
 # Convert CustomerID to integer to remove decimal points
 data_sorted_custom['CustomerID'] = data_sorted_custom['CustomerID'].astype(int).astype(str)
