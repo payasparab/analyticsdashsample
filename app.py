@@ -24,18 +24,20 @@ sort_criteria = st.radio(
 # Apply custom sorting logic based on the selected criteria
 data_sorted_custom = custom_sort(data, sort_criteria)
 
+# Apply secondary sorting by engagement_score
+data_sorted_custom = data_sorted_custom.sort_values(by='engagement_score', ascending=False)
 
 # Convert CustomerID to integer to remove decimal points
-data_sorted_final['CustomerID'] = data_sorted_final['CustomerID'].astype(int)
+data_sorted_custom['CustomerID'] = data_sorted_custom['CustomerID'].astype(int).astype(str)
 
 # Round `avg_` columns to no decimal places
-avg_columns = [col for col in data_sorted_final.columns if col.startswith("avg_")]
-data_sorted_final[avg_columns] = data_sorted_final[avg_columns].round(0)
+avg_columns = [col for col in data_sorted_custom.columns if col.startswith("avg_")]
+data_sorted_custom[avg_columns] = data_sorted_custom[avg_columns].round(0)
 
 # Add dollar signs and round to no decimals for revenue columns
-rev_columns = [col for col in data_sorted_final.columns if 'rev' in col]
-data_sorted_final[rev_columns] = data_sorted_final[rev_columns].applymap(lambda x: f"${x:,.0f}")
+rev_columns = [col for col in data_sorted_custom.columns if 'rev' in col]
+data_sorted_custom[rev_columns] = data_sorted_custom[rev_columns].applymap(lambda x: f"${x:,.0f}")
 
 # Display the final sorted DataFrame
 st.write("Sorted Customer Data:")
-st.dataframe(data_sorted_final)
+st.dataframe(data_sorted_custom, hide_index=True)
