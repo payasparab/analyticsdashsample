@@ -107,6 +107,15 @@ st.metric(label="Number of Customers Matching Criteria", value=num_customers)
 
 
 if st.button('Reset Filters'):
+    # Reset checkboxes
+    st.session_state['recurring_orders'] = False
+    st.session_state['multiple_items'] = False
+
+    # Reset sliders
+    st.session_state['num_orders_range'] = (int(data['num_orders'].min()), int(data['num_orders'].max()))
+    st.session_state['avg_rev_per_order_range'] = (float(data['avg_rev_per_order'].min()), float(data['avg_rev_per_order'].max()))
+    st.session_state['relationship_length_range'] = (int(data['relationship_length_days'].min()), int(data['relationship_length_days'].max()))
+    st.session_state['time_since_last_order_range'] = (int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max()))
     st.experimental_rerun()
 
 # Display the total number of customers covered by the current cut of data
