@@ -7,9 +7,6 @@ data = pd.read_csv('customer_ranker.csv')
 # Add a header
 st.title("Interactive Customer Ranker")
 
-# Create a toggle with custom sorting options
-st.header('Sorting Criteria')
-
 st.header('Quick Filters')
 # Apply checkbox filters first
 filtered_data = data.copy()
@@ -33,10 +30,14 @@ if conditions:
         combined_condition &= condition
     filtered_data = filtered_data[combined_condition]
 
+st.header('Account Filters')
 # Add sliders for numerical filters
 num_orders_range = st.slider("Number of Orders", int(data['num_orders'].min()), int(data['num_orders'].max()), (int(data['num_orders'].min()), int(data['num_orders'].max())))
 avg_rev_per_order_range = st.slider("Average Revenue per Order", float(data['avg_rev_per_order'].min()), float(data['avg_rev_per_order'].max()), (float(data['avg_rev_per_order'].min()), float(data['avg_rev_per_order'].max())))
 # Add sliders for numerical filters including the relationship length
+time_since_last_order_range = st.slider("Time Since Last Order (days)", int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max()), (int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max())))
+
+
 relationship_length_range = st.slider(
     "Relationship Length (days)", 
     int(data['relationship_length_days'].min()), 
@@ -44,13 +45,12 @@ relationship_length_range = st.slider(
     (int(data['relationship_length_days'].min()), int(data['relationship_length_days'].max()))
 )
 
-time_since_last_order_range = st.slider("Time Since Last Order (days)", int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max()), (int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max())))
 
 # Apply slider filters after checkbox filters
 filtered_data = filtered_data[
     (filtered_data['num_orders'] >= num_orders_range[0]) & (filtered_data['num_orders'] <= num_orders_range[1]) &
     (filtered_data['avg_rev_per_order'] >= avg_rev_per_order_range[0]) & (filtered_data['avg_rev_per_order'] <= avg_rev_per_order_range[1]) &
-    (filtered_data['time_since_last_order_days'] >= time_since_last_order_range[0]) & (filtered_data['time_since_last_order_days'] <= time_since_last_order_range[1])
+    (filtered_data['time_since_last_order_days'] >= time_since_last_order_range[0]) & (filtered_data['time_since_last_order_days'] <= time_since_last_order_range[1])  
 ]
 
 filtered_data = filtered_data[
