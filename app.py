@@ -5,7 +5,7 @@ import pandas as pd
 data = pd.read_csv('customer_ranker.csv')
 
 # Add a header
-st.title("Interactive Customer Data for Customer Success")
+st.title("Interactive Customer Ranker")
 
 # Custom sorting logic function for "Recently Sold Accounts" and "Aged Accounts"
 def custom_sort(data, criteria):
@@ -16,29 +16,33 @@ def custom_sort(data, criteria):
     return data
 
 # Create a toggle with custom sorting options
+st.header('Sorting Criteria')
 sort_criteria = st.radio(
     "Select sorting criteria:",
-    ("Recently Sold Accounts", "Aged Accounts")
+    ("Recently Sold Accounts", "No Recent Sales Accounts")
 )
 
+st.header('Quick Filters')
 # Add filters for recurring orders and multiple unique items
-recurring_orders = st.checkbox("Show only recurring orders (num_orders > 0)")
+recurring_orders = st.checkbox("Show only recurring orders (num_orders > 1)")
 multiple_items = st.checkbox("Show only customers with multiple unique items (num_unique_items_bought > 1)")
 
+st.header('Customer Profile Detailed Filter')
 # Add sliders for numerical filters
+num_orders_range = st.slider("Number of Orders", int(data['num_orders'].min()), int(data['num_orders'].max()), (int(data['num_orders'].min()), int(data['num_orders'].max())))
 avg_rev_per_order_range = st.slider("Average Revenue per Order", float(data['avg_rev_per_order'].min()), float(data['avg_rev_per_order'].max()), (float(data['avg_rev_per_order'].min()), float(data['avg_rev_per_order'].max())))
 relationship_length_range = st.slider("Relationship Length (days)", int(data['relationship_length_days'].min()), int(data['relationship_length_days'].max()), (int(data['relationship_length_days'].min()), int(data['relationship_length_days'].max())))
 time_since_last_order_range = st.slider("Time Since Last Order (days)", int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max()), (int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max())))
 
 # Apply filters
 filtered_data = data[
+    (data['num_orders'] >= num_orders_range[0]) & (data['num_orders'] <= num_orders_range[1]) &
     (data['avg_rev_per_order'] >= avg_rev_per_order_range[0]) & (data['avg_rev_per_order'] <= avg_rev_per_order_range[1]) &
     (data['relationship_length_days'] >= relationship_length_range[0]) & (data['relationship_length_days'] <= relationship_length_range[1]) &
     (data['time_since_last_order_days'] >= time_since_last_order_range[0]) & (data['time_since_last_order_days'] <= time_since_last_order_range[1])
 ]
-
 if recurring_orders:
-    filtered_data = filtered_data[filtered_data['num_orders'] > 0]
+    filtered_data = filtered_data[filtered_data['num_orders'] > 1]
 
 if multiple_items:
     filtered_data = filtered_data[filtered_data['num_unique_items_bought'] > 1]
@@ -60,11 +64,46 @@ data_sorted_custom[avg_columns] = data_sorted_custom[avg_columns].round(0)
 rev_columns = [col for col in data_sorted_custom.columns if 'rev' in col]
 data_sorted_custom[rev_columns] = data_sorted_custom[rev_columns].applymap(lambda x: f"${x:,.0f}")
 
+display_cols = [
+    'CustomerID', 
+    'engagement_score', 
+    'total_net_rev', 
+    'num_orders', 
+    'avg_rev_per_order',
+    'num_unique_items_bought', 
+    'relationship_length_days',
+    'time_since_last_order_days'
+]
+
+data_display = data_sorted_custom[display_cols]
+data_display.columns = [
+    'CustomerID',
+    'Engage Score',
+    'Total Lifetime Revenue',
+    '# of Orders', 
+    'Avg Rev Per Order',
+    'Unique Items Purchased',
+    'Length of Relationship', 
+    'Days Since Last Order'
+]
+
+# Function to convert DataFrame to CSV
+def convert_df_to_csv(df):
+    return df.to_csv(index=False).encode('utf-8')
 
 # Display the final sorted DataFrame
 st.write("Sorted Customer Data:")
 st.dataframe(
-    data_sorted_custom, 
+    data_display, 
     hide_index=True,  
     use_container_width=True
+)
+
+# Create a download button
+csv = convert_df_to_csv(data_display)
+st.download_button(
+    label="Download Customer List as CSV",
+    data=csv,
+    file_name='customer_list.csv',
+    mime='text/csv',
 )
