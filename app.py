@@ -4,6 +4,7 @@ import pandas as pd
 # Load the dataset
 data = pd.read_csv('customer_ranker.csv')
 
+
 # Add a header
 st.title("Interactive Customer Ranker")
 
@@ -11,30 +12,32 @@ st.title("Interactive Customer Ranker")
 st.header('Sorting Criteria')
 
 st.header('Quick Filters')
-# Add filters for recurring orders and multiple unique items
+# Apply checkbox filters first
+filtered_data = data.copy()
+
+
 recurring_orders = st.checkbox("Show only recurring orders (num_orders > 1)")
 multiple_items = st.checkbox("Show only customers with multiple unique items (num_unique_items_bought > 1)")
 
-st.header('Customer Profile Detailed Filter')
-# Add sliders for numerical filters
-num_orders_range = st.slider("Number of Orders", int(data['num_orders'].min()), int(data['num_orders'].max()), (int(data['num_orders'].min()), int(data['num_orders'].max())))
-avg_rev_per_order_range = st.slider("Average Revenue per Order", float(data['avg_rev_per_order'].min()), float(data['avg_rev_per_order'].max()), (float(data['avg_rev_per_order'].min()), float(data['avg_rev_per_order'].max())))
-relationship_length_range = st.slider("Relationship Length (days)", int(data['relationship_length_days'].min()), int(data['relationship_length_days'].max()), (int(data['relationship_length_days'].min()), int(data['relationship_length_days'].max())))
-time_since_last_order_range = st.slider("Time Since Last Order (days)", int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max()), (int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max())))
-
-# Apply filters
-filtered_data = data[
-    (data['num_orders'] >= num_orders_range[0]) & (data['num_orders'] <= num_orders_range[1]) &
-    (data['avg_rev_per_order'] >= avg_rev_per_order_range[0]) & (data['avg_rev_per_order'] <= avg_rev_per_order_range[1]) &
-    (data['relationship_length_days'] >= relationship_length_range[0]) & (data['relationship_length_days'] <= relationship_length_range[1]) &
-    (data['time_since_last_order_days'] >= time_since_last_order_range[0]) & (data['time_since_last_order_days'] <= time_since_last_order_range[1])
-]
 if recurring_orders:
     filtered_data = filtered_data[filtered_data['num_orders'] > 1]
 
 if multiple_items:
     filtered_data = filtered_data[filtered_data['num_unique_items_bought'] > 1]
 
+# Add sliders for numerical filters
+num_orders_range = st.slider("Number of Orders", int(data['num_orders'].min()), int(data['num_orders'].max()), (int(data['num_orders'].min()), int(data['num_orders'].max())))
+avg_rev_per_order_range = st.slider("Average Revenue per Order", float(data['avg_rev_per_order'].min()), float(data['avg_rev_per_order'].max()), (float(data['avg_rev_per_order'].min()), float(data['avg_rev_per_order'].max())))
+relationship_length_range = st.slider("Relationship Length (days)", int(data['relationship_length_days'].min()), int(data['relationship_length_days'].max()), (int(data['relationship_length_days'].min()), int(data['relationship_length_days'].max())))
+time_since_last_order_range = st.slider("Time Since Last Order (days)", int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max()), (int(data['time_since_last_order_days'].min()), int(data['time_since_last_order_days'].max())))
+
+# Apply slider filters after checkbox filters
+filtered_data = filtered_data[
+    (filtered_data['num_orders'] >= num_orders_range[0]) & (filtered_data['num_orders'] <= num_orders_range[1]) &
+    (filtered_data['avg_rev_per_order'] >= avg_rev_per_order_range[0]) & (filtered_data['avg_rev_per_order'] <= avg_rev_per_order_range[1]) &
+    (filtered_data['relationship_length_days'] >= relationship_length_range[0]) & (filtered_data['relationship_length_days'] <= relationship_length_range[1]) &
+    (filtered_data['time_since_last_order_days'] >= time_since_last_order_range[0]) & (filtered_data['time_since_last_order_days'] <= time_since_last_order_range[1])
+]
 
 # Apply secondary sorting by engagement_score
 data_sorted_custom =  filtered_data.sort_values(by=['engagement_score', 'total_net_rev'], ascending=[False, False])
