@@ -15,15 +15,28 @@ st.header('Quick Filters')
 # Apply checkbox filters first
 filtered_data = data.copy()
 
-
 recurring_orders = st.checkbox("Show only recurring orders (num_orders > 1)")
 multiple_items = st.checkbox("Show only customers with multiple unique items (num_unique_items_bought > 1)")
 
+
+# Start with the full dataset
+filtered_data = data.copy()
+
+# Build combined conditions
+conditions = []
+
 if recurring_orders:
-    filtered_data = filtered_data[filtered_data['num_orders'] > 1]
+    conditions.append(filtered_data['num_orders'] > 1)
 
 if multiple_items:
-    filtered_data = filtered_data[filtered_data['num_unique_items_bought'] > 1]
+    conditions.append(filtered_data['num_unique_items_bought'] > 1)
+
+# Apply all conditions at once
+if conditions:
+    combined_condition = conditions[0]
+    for condition in conditions[1:]:
+        combined_condition &= condition
+    filtered_data = filtered_data[combined_condition]
 
 # Add sliders for numerical filters
 num_orders_range = st.slider("Number of Orders", int(data['num_orders'].min()), int(data['num_orders'].max()), (int(data['num_orders'].min()), int(data['num_orders'].max())))
@@ -38,6 +51,7 @@ filtered_data = filtered_data[
     (filtered_data['relationship_length_days'] >= relationship_length_range[0]) & (filtered_data['relationship_length_days'] <= relationship_length_range[1]) &
     (filtered_data['time_since_last_order_days'] >= time_since_last_order_range[0]) & (filtered_data['time_since_last_order_days'] <= time_since_last_order_range[1])
 ]
+
 
 # Apply secondary sorting by engagement_score
 data_sorted_custom =  filtered_data.sort_values(by=['engagement_score', 'total_net_rev'], ascending=[False, False])
