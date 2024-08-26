@@ -17,10 +17,6 @@ filtered_data = data.copy()
 recurring_orders = st.checkbox("Show only recurring customers (num_orders > 1)")
 multiple_items = st.checkbox("Show only customers with multiple unique items (num_unique_items_bought > 1)")
 
-
-# Start with the full dataset
-filtered_data = data.copy()
-
 # Build combined conditions
 conditions = []
 
@@ -110,7 +106,8 @@ num_customers = data_sorted_custom['CustomerID'].nunique()
 st.metric(label="Number of Customers Matching Criteria", value=num_customers)
 
 
-
+if st.button('Reset Filters'):
+    st.experimental_rerun()
 
 # Display the total number of customers covered by the current cut of data
 total_customers = data['CustomerID'].nunique()
